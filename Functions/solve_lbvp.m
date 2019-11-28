@@ -1,4 +1,4 @@
-function [h] = solve_lbvp(L,f,B,g,N)
+function [h] = solve_lbvp(L, f, B, g, N)
 % author: Bryan Vu
 % date: 9/23/2019
 % Description

@@ -40,7 +40,7 @@ elseif all(isfield(Grid, {'Nx', 'Ny'}))  % 2D
     Dx = kron(Dx1, Iy);
     
     %% Construct 2D Operators
-    D = [Dx, Dy];
+    D = [Dx, Dy];  % implemented x-first
     G = -D';  % adjoints
 
     % Using natural BC's

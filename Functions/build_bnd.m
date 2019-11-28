@@ -38,7 +38,9 @@ end
 
 %% Compute Fluxes
 fn = spalloc(Grid.N,1,0);
-fn(Param.dof_neu) = Param.qb*Grid.A(Param.dof_f_neu)/Grid.V(Param.dof_neu);
+% fn(Param.dof_neu) = Param.qb*Grid.A(Param.dof_f_neu)/Grid.V(Param.dof_neu);
+fn(Param.dof_neu) = Param.qb*Grid.V(Param.dof_f_neu)/Grid.A(Param.dof_neu);
+% figure out which is which already 
 
 %% Construct Constraint Space and Projection Matrix
 dof_bnd = Param.dof_dir;

@@ -1,4 +1,4 @@
-function [q] = comp_flux(D,Kd,G,h,fs,Grid,Param)
+function [q] = comp_flux(D, Kd, G, h, fs, Grid, Param)
 % author: Bryan Vu
 % date: 09/30/2019
 % Description:
