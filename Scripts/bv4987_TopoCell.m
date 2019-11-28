@@ -3,6 +3,9 @@
 % date: 11/10/19
 clc; clear all; close all;
 
+%% Add Path to External Functions
+addpath('../Functions')
+
 %% Physical parameters
 Length = 500; % [m] aquifer length
 Height = 50; % [m] aquifer thickness
@@ -35,16 +38,15 @@ g = hb(Grid.xc)';  % heterogeneous dirichlet for ymax faces
 [D,G,I] = build_ops(Grid);
 [B,N,fn] = build_bnd(Param, Grid, I);
 
-%% Solve BVP
 K = K_hyd*ones(Grid.Ny, Grid.Nx);
 % isotropic and harmonic mean
 Kd = comp_mean(K, 1, -1, Grid);
-L = -D*Kd*G;
+L = -D*Kd*G;  % system matrix
 
-fs = spalloc(Grid.N, 1, 0);
+%% Solve Flow Problem
+fs = spalloc(Grid.N, 1, 0);  % no source
 h = solve_lbvp(L, fs+fn, B, g, N);
 
-%% Compute Flux and Streamfunction
 q = comp_flux(D, Kd, G, h, fs, Grid, Param);
 [PSI, psi_min, psi_max] = comp_streamfun(q, Grid);
 
@@ -61,7 +63,7 @@ qy_int = interp2(Xy,Yy,qy,Xc,Yc);
 
 f = abs(qx_int) + abs(qy_int);
 % exclude boundaries
-f([1,end],[1,end]) = max(f(:));  % fix!!!!
+f([1,end],[1,end]) = max(f(:));  
 min_val = min(f(:));
 [row, col] = find(f==min_val);
 
@@ -71,17 +73,20 @@ xx = linspace(0,Length,length(g))';
 plot(xx, g, 'linewidth', 2)
 title('Head on top boundary')
 
-figure('Position', [250, 300, 1250, 350]); 
+figure('Position', [250, 300, 1000, 350]); 
+
+colors = {[0, 0.4470, 0.7410], [0.8500, 0.32500, 0.0980],... 
+          [0.9290, 0.6940, 0.1250], [0.4940, 0.1840, 0.5560]};
 
 figure(2);
 hold on;
-contour(Xx, Yx, qx, [0 0], '-g', 'LineWidth', 2,'color',[.83,.26,.22])
-contour(Xy, Yy, qy, [0 0], '-r', 'LineWidth', 2,'color',[.2,.6,1]) 
-scatter3(Grid.xc(col), Grid.yc(row), f(row,col), 50, 'filled', 'k')
+contour(Xx, Yx, qx, [0 0], 'LineWidth', 2, 'color', cell2mat(colors(4)))
+contour(Xy, Yy, qy, [0 0], 'LineWidth', 2, 'color', cell2mat(colors(3))) 
+scatter3(Grid.xc(col), Grid.yc(row), f(row,col), 50, 'filled', 'w', 'MarkerEdgeColor', 'k')
 % Flownet 
 h = reshape(h,[Grid.Ny,Grid.Nx]);
-h_style = {'LineWidth'; 2};
-psi_style = {'LineWidth'; 2};
+h_style = {'LineWidth'; 1.5; 'color'; cell2mat(colors(2))};
+psi_style = {'LineWidth'; 1.5; 'color'; cell2mat(colors(1))};
 plot_flownet(Nh, Ns, h, PSI, h_style, psi_style, Grid)
 
 title('Nullclines')
@@ -89,14 +94,15 @@ legend('qx','qy','stag. pt.')
 hold off;
 
 % Flow Cells
-figure('Position', [250, 300, 1250, 350]); 
+figure('Position', [250, 300, 1000, 350]); 
 
 [Xs,Ys] = meshgrid(Grid.xf,Grid.yf);  % cell corners for PSI
 figure(3);
 hold on;
+contour(Xs, Ys, PSI, [PSI(row,col), PSI(row,col)], 'LineWidth', 2, 'color', cell2mat(colors(3)))
+scatter3(Grid.xc(col), Grid.yc(row), f(row,col), 50, 'filled', 'w', 'MarkerEdgeColor', 'k')
 plot_flownet(Nh, Ns, h, PSI, h_style, psi_style, Grid)
-contour(Xs, Ys, PSI, [PSI(row,col), PSI(row,col)], '-r', 'LineWidth', 2)
-scatter3(Grid.xc(col), Grid.yc(row), f(row,col), 50, 'filled', 'k')
 hold off;
+legend('Cell boundaries', 'stg. pt.')
 title('Flow Cells')
 

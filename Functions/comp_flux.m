@@ -45,8 +45,8 @@ dof_f_bnd = [Param.dof_f_dir Param.dof_f_neu]';
 res_bnd = -D*Kd*G*h - fs; 
 
 % check sign (direction) of flux on the boundary
-sign = -ones(length(dof_bnd), 1);
-subset = ismember(Grid.dof_f_xmin, dof_bnd); 
-sign(Grid.dof_f_xmin(subset)) = 1;  % flux left to right chosen positive
+sign = ones(length(dof_f_bnd), 1);
+subset = ismember(Grid.dof_f_xmin, dof_f_bnd); 
+sign(Grid.dof_f_xmin(subset)) = -1;  % flux left to right chosen positive
 
 q(dof_f_bnd) = sign.*res_bnd(dof_bnd).*Grid.V(dof_bnd)./Grid.A(dof_f_bnd);

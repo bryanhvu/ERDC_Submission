@@ -20,10 +20,10 @@ if strcmp(Grid.psi_x0,'xmin_ymin') && strcmp(Grid.psi_dir,'xy')
     Qx = reshape(Grid.A(1:Grid.Nfx).*q(1:Grid.Nfx),Grid.Ny,Grid.Nx+1); % Horizontal fluxes
     PSI = cumsum([-Qymin;Qx],1); % integrals into domain with Qymin as initial value
 elseif strcmp(Grid.psi_x0,'xmin_ymin') && strcmp(Grid.psi_dir,'yx')
-    % Integrate vertically along xmin boundary first then horizontally into the domain.
+    % Int27egrate vertically along xmin boundary first then horizontally into the domain.
     Qxmin = [0 cumsum(Grid.A(Grid.dof_f_xmin)*q(Grid.dof_f_xmin))']; % Integral of flow into xmin boundary
     Qy = reshape(Grid.A(Grid.Nfx+1,:)*q(Grid.Nfx+1,:),Grid.Ny+1,Grid.Nx); % Vertical fluxes
-    PSI = cumsum([-Qxmin;Qy],1); % integrals into domain with Qxmin as initial value
+    PSI = cumsum([Qxmin;Qy],1); % integrals into domain with Qxmin as initial value
 else
     error('Unknown streamfunction setup.\n')
 end

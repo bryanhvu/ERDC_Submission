@@ -18,14 +18,14 @@ function [D,G,I]=build_ops(Grid)
 % >> [D,G,I]=build_ops(Grid);
 
 I = speye(Grid.N);  % built the same for 1D and 2D
-if any(~isfield(Grid,{'Nx', 'Ny'}))  % 1D
+if (Grid.Nx == Grid.N) || (Grid.Ny == Grid.N)  % 1D
     %% Build 1D Operators 
     diag = (1/Grid.dx) * ones(Grid.N, 1);
     D = spdiags([-diag, diag], 0:1, Grid.N, Grid.Nfx);   
     G = -D';  % adjoints
     G(1,1) = 0; G(end,end) = 0;  % Using natural BC's
     
-elseif all(isfield(Grid, {'Nx', 'Ny'}))  % 2D
+elseif (Grid.N > Grid.Nx) || (Grid.N > Grid.Ny)  % 2D
     %% Assemble Components of Divergence Operator
     % Divergence Operator in y cells
     diag = (1/Grid.dy) * ones(Grid.Ny, 1);
@@ -44,10 +44,10 @@ elseif all(isfield(Grid, {'Nx', 'Ny'}))  % 2D
     G = -D';  % adjoints
 
     % Using natural BC's
-    G(Grid.dof_f_xmin,Grid.dof_xmin) = 0;
-    G(Grid.dof_f_xmax,Grid.dof_xmax) = 0;
-    G(Grid.dof_f_ymin,Grid.dof_ymin) = 0;
-    G(Grid.dof_f_ymax,Grid.dof_ymax) = 0;
+    G(Grid.dof_f_xmin, Grid.dof_xmin) = 0;
+    G(Grid.dof_f_xmax, Grid.dof_xmax) = 0;
+    G(Grid.dof_f_ymin, Grid.dof_ymin) = 0;
+    G(Grid.dof_f_ymax, Grid.dof_ymax) = 0;
 else
     error('Unknown Grid setup')
 end
